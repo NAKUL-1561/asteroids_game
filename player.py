@@ -8,6 +8,8 @@ class Player(CircleShape):
        super().__init__(x, y, radius)
        self.rotation = 0
        self.shoot_cooldown_timer = 0
+       self.velocity = pygame.Vector2(0, 0)
+       self.invulnerable_timer = 0
 
     # in the Player class
     def triangle(self):
@@ -19,7 +21,8 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
-        pygame.draw.polygon(surface = screen, color = "white", points = self.triangle(),width = LINE_WIDTH)
+        color = "yellow" if self.invulnerable_timer > 0 else "white"
+        pygame.draw.polygon(surface=screen, color=color, points=self.triangle(), width=LINE_WIDTH)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -32,19 +35,39 @@ class Player(CircleShape):
 
         if keys[pygame.K_d]:
             self.rotate(dt)
-        
+
         if keys[pygame.K_w]:
-            self.move(dt)
-        
+            self.accelerate(1, dt)
+
         if keys[pygame.K_s]:
-            self.move(-dt)
-        
+            self.accelerate(-1, dt)
+
         if keys[pygame.K_SPACE]:
             if self.shoot_cooldown_timer <= 0:
                 self.shoot()
                 self.shoot_cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-            if self.shoot_cooldown_timer > 0:
-                self.shoot_cooldown_timer -= dt
+
+        if self.shoot_cooldown_timer > 0:
+            self.shoot_cooldown_timer -= dt
+
+        self.position += self.velocity * dt
+        self.velocity *= PLAYER_FRICTION
+        self.wrap_position()
+
+        if self.invulnerable_timer > 0:
+            self.invulnerable_timer -= dt
+
+    def accelerate(self, direction, dt):
+        unit_vector = pygame.Vector2(0, 1).rotate(self.rotation)
+        self.velocity += unit_vector * PLAYER_ACCELERATION * direction * dt
+        if self.velocity.length() > PLAYER_SPEED:
+            self.velocity.scale_to_length(PLAYER_SPEED)
+
+    def reset(self, x, y):
+        self.position = pygame.Vector2(x, y)
+        self.velocity = pygame.Vector2(0, 0)
+        self.rotation = 0
+        self.invulnerable_timer = 1.5
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)
