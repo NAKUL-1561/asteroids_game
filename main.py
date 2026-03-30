@@ -9,27 +9,29 @@ from logger import log_state, log_event
 
 
 def main():
-    
     pygame.init()
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 30)
+
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
 
-    Shot.containers = (shots,updatable,drawable)
-    Player.containers = (updatable,drawable)
-    Asteroid.containers = (asteroids,updatable,drawable)
+    Shot.containers = (shots, updatable, drawable)
+    Player.containers = (updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable,)
 
     asteroid_field = AsteroidField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, PLAYER_RADIUS)
 
+    lives = STARTING_LIVES
     score = 0
-    lives = PLAYER_LIVES
-    font = pygame.font.Font(None, 32)
+    player_alive = True
+    respawn_timer = 0.0
 
     dt = 0
 
@@ -40,35 +42,51 @@ def main():
             if event.type == pygame.QUIT:
                 return
 
-        updatable.update(dt)
+        if player_alive:
+            player.update(dt)
+        else:
+            respawn_timer -= dt
+            if respawn_timer <= 0:
+                player.respawn(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                player_alive = True
+
+        asteroid_field.update(dt)
+        asteroids.update(dt)
+        shots.update(dt)
+
         screen.fill("black")
 
-        for asteroid in list(asteroids):
-            for shot in list(shots):
+        for asteroid in asteroids:
+            for shot in shots:
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")
                     shot.kill()
-                    points = int(ASTEROID_BASE_SCORE * (ASTEROID_MAX_RADIUS / asteroid.radius))
-                    score += points
                     asteroid.split()
+                    score += SCORE_PER_ASTEROID
 
-            if player.collides_with(asteroid) and player.invulnerable_timer <= 0:
+            if player_alive and player.collides_with(asteroid):
                 log_event("player_hit")
                 lives -= 1
-                asteroid.kill()
+                player_alive = False
+                respawn_timer = RESPAWN_SECONDS
                 if lives <= 0:
-                    print(f"Game Over! Final score: {score}")
+                    print("Game Over! Final score:", score)
                     sys.exit()
-                player.reset(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-                break
 
         for obj in drawable:
+            if obj is player and not player_alive:
+                continue
             obj.draw(screen)
 
-        score_surface = font.render(f"Score: {score}", True, "white")
-        lives_surface = font.render(f"Lives: {lives}", True, "white")
-        screen.blit(score_surface, (16, 16))
-        screen.blit(lives_surface, (16, 48))
+        # HUD
+        score_text = font.render(f"Score: {score}", True, "white")
+        lives_text = font.render(f"Lives: {lives}", True, "white")
+        screen.blit(score_text, (10, 10))
+        screen.blit(lives_text, (10, 40))
+
+        if not player_alive:
+            countdown_text = font.render(f"Respawning in {respawn_timer:.1f}s", True, "yellow")
+            screen.blit(countdown_text, (10, 70))
 
         pygame.display.flip()
 
