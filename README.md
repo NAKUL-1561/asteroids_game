@@ -8,4 +8,4 @@ Clean code, solving problems, and co-operating with people is what I enjoy doing
 
 What I’m Working With💻 Languages & Technologies: Python; Main Focus: Game Development & Interactive Applications
 
-Featured Projects:Asteroids Game (https://github.com/NAKUL-1561/asteroids_game)A Python-based asteroids game which showcases game mechanics and interactive programming.
+Featured Projects:Asteroids Game (https://github.com/NAKUL-1561/asteroids_game). A Python-based asteroids game which showcases game mechanics and interactive programming.
