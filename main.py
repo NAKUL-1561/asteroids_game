@@ -1,14 +1,18 @@
-import sys, pygame
+import sys
+import asyncio
+import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from player import Player
 from shot import Shot
 from constants import *
-from logger import log_state, log_event
+
+# Stubs for web compatibility (file I/O not available in browser)
+def log_state(): pass
+def log_event(event_name): pass
 
 
-
-def main():
+async def main():
     pygame.init()
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -92,7 +96,8 @@ def main():
 
         # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
+        await asyncio.sleep(0)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
