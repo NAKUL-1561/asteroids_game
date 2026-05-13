@@ -1,6 +1,14 @@
-# Python-generated files
+# Byte-compiled / cache
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.env
+
+# Distribution / packaging
 build/
 dist/
 wheels/
