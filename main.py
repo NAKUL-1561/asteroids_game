@@ -1,5 +1,4 @@
 import sys
-import asyncio
 import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
@@ -7,12 +6,8 @@ from player import Player
 from shot import Shot
 from constants import *
 
-# Stubs for web compatibility (file I/O not available in browser)
-def log_state(): pass
-def log_event(event_name): pass
 
-
-async def main():
+def main():
     pygame.init()
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -40,8 +35,6 @@ async def main():
     dt = 0
 
     while True:
-        log_state()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -63,13 +56,11 @@ async def main():
         for asteroid in asteroids:
             for shot in shots:
                 if shot.collides_with(asteroid):
-                    log_event("asteroid_shot")
                     shot.kill()
                     asteroid.split()
                     score += SCORE_PER_ASTEROID
 
             if player_alive and player.collides_with(asteroid):
-                log_event("player_hit")
                 lives -= 1
                 player_alive = False
                 respawn_timer = RESPAWN_SECONDS
@@ -96,8 +87,7 @@ async def main():
 
         # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
-        await asyncio.sleep(0)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
