@@ -1,14 +1,32 @@
-# Python-generated files
+# Byte-compiled / cache
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.py[cod]
+*$py.class
 
 # Virtual environments
-.venv
-game_state.jsonl
-game_events.jsonl
-uv.lock
-pyproject.toml
+venv/
+.env/
+.env
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PyInstaller
+*.spec
+
+# Logs
+*.log
+
+# Pygame saves/assets cache
+saves/
+cache/
